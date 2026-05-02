@@ -1,0 +1,28 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip setuptools
+        pip install kivy buildozer
+    - name: Build APK
+      run: |
+        sed -i 's/^source.dir = .*/source.dir = $(pwd)/' buildozer.spec
+        buildozer android debug
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: mytelegram-apk
+        path: bin/*.apk
